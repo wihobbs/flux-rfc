@@ -33,10 +33,8 @@ Related Standards
 Background
 **********
 
-Toward the goal of supporting users who run batch jobs with variable end time
-dependent on queues, runtime, and other factors, the Flux Library for Adaptable
-Notifications (FLAN) provides event-driven functionality that sends external
-notifications of job events. 
+The Flux Library for Adaptable Notifications (FLAN) provides event-driven
+functionality that sends external notifications of job events. 
 
 Terminology
 ***********
@@ -53,12 +51,11 @@ Notification-enabled jobs
   events in the job's life cycle. For a more detailed definition of job events,
   refer to :doc:`spec_21`.
 
-
 Requirements
 ************
 
- - By default in a system-instance, do not notify a user of any job events.
-   Allow the user to override this default with a jobspec attribute,
+ - By default, do not notify a user of any job events.
+ - Allow the user to override this default with a jobspec attribute,
    ``system.notify``.
  - Support notification after any event of the job, where events are defined in
    :doc:`spec_21`.
@@ -74,8 +71,7 @@ Requirements
 Implementation 
 **************
 
-FLAN SHALL be implemented by a Python service that MAY be started under
-``systemd``.
+FLAN SHALL be implemented by a service that MAY be started under ``systemd``.
 
 Introduction
 ============
@@ -89,14 +85,15 @@ The Flux Library for Adaptable Notifications (FLAN) provides a server that
 opens a streaming RPC request to the JoE, receives events from the JoE, stores
 jobspec, event logs, and resource sets by jobid for all active jobs, and allows
 for clients to asynchronously perform operations (such as send emails) based on
-these events. FLAN implements an event dispatcher to handle batches of events
+these events. 
+
+FLAN implements an event dispatcher to handle batches of events
 based on a timer, allowing for a massive number of events to be handled
-semi-synchronously without blocking the receipt of more RPC responses. Since
-FLAN is run as a separate python script alongside a Flux instance, it can never
-block the job-manager or other critical Flux services and need not be run under
-the system ``flux python``, allowing for clients to take advantage of the latest
-Python features. FLAN must be run under the instance owner credentials but
-needn't be run on the same node as the rank 0 Flux broker.
+semi-synchronously with rate limiting for massive job throughput. Since
+FLAN is run as a separate process alongside a Flux instance, it can never
+block the job-manager or other critical Flux services. FLAN must be run under 
+the instance owner credentials but needn't be run on the same node as the
+rank 0 Flux broker.
 
 Initial Request
 ===============
